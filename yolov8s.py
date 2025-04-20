@@ -1,5 +1,7 @@
 import cv2
 from ultralytics import YOLO
+import serial
+import time
 
 model = YOLO("yolov8s.pt")  # Pretrained on COCO
 
@@ -52,6 +54,14 @@ while True:
     v, w = compute_control_signals(bboxes, img_w, img_h)
     print(f"v={v:.2f}, w={w:.2f}")
 
+    serial = serial.Serial(port = "/dev/ttyTHS1", baudrate=9600)    
+    
+    time.sleep(1) # Wait for port to initialize
+
+    # Turn data into a string and write
+    data = '!'+ str(v) + '@' + str(w) + '#'
+    serial.write(data.encode('utf-8'))
+
     # Draw bounding boxes
     for (x1, y1, x2, y2, conf, label) in bboxes:
         cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
@@ -64,6 +74,6 @@ while True:
 
     if cv2.waitKey(1) & 0xFF == 27:  # ESC
         break
-
+serial.close()
 cap.release()
 cv2.destroyAllWindows()
