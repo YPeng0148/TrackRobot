@@ -17,11 +17,14 @@ def compute_control_signals(bboxes, img_w, img_h):
 
     max_v = 0.8
     box_area = (x2 - x1) * (y2 - y1)
-    area_thresh = (img_w * img_h) / 10
-    if box_area < area_thresh:
+    area_thresh_maxspeed = (img_w * img_h) / 10
+    area_thresh_midspeed = (img_w * img_h) / 3
+    if box_area < area_thresh_maxspeed:
         v = 0.8
-    else:
+    elif box_area < area_thresh_midspeed:
         v = 0.3
+    else:
+        v = 0
     v = max(0.0, min(v, max_v))
 
     return v, w
